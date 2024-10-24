@@ -1,0 +1,42 @@
+app: letsgetrandy
+service: artisanaljs
+plugins:
+  - serverless-lift
+
+frameworkVersion: "3"
+
+custom:
+  siteName: www.artisanaljs.com
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+
+package:
+  exclude:
+    - .github/**
+    - .yarn/**
+    - node_modules/**
+
+constructs:
+  website:
+    type: static-website
+    path: public
+    domain: ${self:custom.siteName}
+    certificate: arn:aws:acm:us-east-1:873177725664:certificate/6b46f6e9-2892-47b2-b666-4270b2213682
+    extensions:
+      bucket:
+        Properties:
+          BucketName: ${self:custom.siteName}
+
+# The `functions` block defines what code to deploy
+functions:
+  helloWorld:
+    handler: functions/hello.handler
+    url: true
+    # The `events` block defines how to trigger the handler.helloWorld code
+    events:
+      - http:
+          path: hello-world
+          method: get
+          cors: true
